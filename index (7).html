@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nyambungin — Chatbot WhatsApp untuk bisnis Anda</title>
+<meta name="description" content="nyambungin memasang dan mengelola chatbot WhatsApp untuk toko dan distributor di Indonesia. Pelanggan dijawab otomatis 24 jam, tim Anda hanya turun tangan saat dibutuhkan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF7;
+    --ink:#12211C;
+    --ink-soft:#5C6B65;
+    --emerald:#1F7A5C;
+    --emerald-dark:#165C45;
+    --amber:#E8B22B;
+    --line:#E2E0D8;
+    --bubble-in:#FFFFFF;
+    --bubble-out:#E7F4ED;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  a{color:var(--emerald-dark);}
+
+  /* ---------- nav ---------- */
+  nav{padding:26px 0; border-bottom:1px solid var(--line);}
+  .navrow{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+  .logo{font-weight:800; font-size:20px; letter-spacing:-.02em;}
+  .logo span{color:var(--emerald);}
+  .navlink{font-weight:500; font-size:15px; text-decoration:none; color:var(--ink-soft);}
+  .navlink:hover{color:var(--ink);}
+
+  /* ---------- hero ---------- */
+  header{padding:72px 0 64px;}
+  .hero{display:grid; grid-template-columns:1fr 380px; gap:64px; align-items:start;}
+  h1{
+    font-size:clamp(34px,5vw,52px); line-height:1.1; font-weight:800;
+    letter-spacing:-.03em; margin:0 0 20px;
+  }
+  .lede{font-size:19px; color:var(--ink-soft); max-width:34em; margin:0 0 32px;}
+  .cta{
+    display:inline-block; background:var(--emerald); color:#fff; text-decoration:none;
+    font-weight:700; font-size:16px; padding:14px 26px; border-radius:6px;
+  }
+  .cta:hover{background:var(--emerald-dark);}
+  .cta-note{font-size:14px; color:var(--ink-soft); margin-top:14px;}
+  .cta-light{background:var(--amber); color:var(--ink);}
+  .cta-light:hover{background:#D4A020;}
+
+  /* ---------- chat ---------- */
+  .phone{
+    background:#EFEDE6; border:1px solid var(--line); border-radius:14px;
+    padding:18px 16px 22px;
+  }
+  .phone-top{
+    display:flex; align-items:center; gap:10px; padding-bottom:14px;
+    border-bottom:1px solid var(--line); margin-bottom:16px;
+  }
+  .avatar{
+    width:34px; height:34px; border-radius:50%; background:var(--emerald);
+    color:#fff; display:grid; place-items:center; font-weight:700; font-size:15px;
+  }
+  .phone-name{font-weight:700; font-size:15px; line-height:1.2;}
+  .phone-status{font-size:12px; color:var(--ink-soft);}
+  .msg{
+    max-width:86%; padding:10px 13px; border-radius:12px; font-size:15px;
+    line-height:1.5; margin-bottom:9px; opacity:0; animation:pop .45s ease forwards;
+  }
+  .msg.in{background:var(--bubble-in); border:1px solid var(--line); border-bottom-left-radius:3px;}
+  .msg.out{
+    background:var(--bubble-out); margin-left:auto;
+    border-bottom-right-radius:3px;
+  }
+  .msg:nth-child(2){animation-delay:.25s;}
+  .msg:nth-child(3){animation-delay:.8s;}
+  .msg:nth-child(4){animation-delay:1.5s;}
+  .msg:nth-child(5){animation-delay:2.1s;}
+  @keyframes pop{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){
+    .msg{animation:none; opacity:1;}
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:64px 0; border-top:1px solid var(--line);}
+  h2{font-size:clamp(26px,3.4vw,34px); font-weight:800; letter-spacing:-.02em; margin:0 0 14px;}
+  .sub{color:var(--ink-soft); max-width:36em; margin:0 0 36px;}
+
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:32px; counter-reset:s;}
+  .step{counter-increment:s;}
+  .step::before{
+    content:counter(s); display:grid; place-items:center;
+    width:32px; height:32px; border-radius:50%; background:var(--ink); color:var(--paper);
+    font-weight:700; font-size:15px; margin-bottom:14px;
+  }
+  .step h3{font-size:18px; margin:0 0 6px; font-weight:700;}
+  .step p{margin:0; color:var(--ink-soft); font-size:15.5px;}
+
+  .feats{display:grid; grid-template-columns:repeat(2,1fr); gap:28px 40px;}
+  .feat h3{font-size:17px; margin:0 0 5px; font-weight:700;}
+  .feat p{margin:0; color:var(--ink-soft); font-size:15.5px;}
+  .feat{padding-left:16px; border-left:2px solid var(--amber);}
+
+  .who{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
+  .who div{background:#fff; border:1px solid var(--line); border-radius:8px; padding:20px;}
+  .who h3{font-size:16px; margin:0 0 5px; font-weight:700;}
+  .who p{margin:0; font-size:15px; color:var(--ink-soft);}
+
+  /* ---------- contact ---------- */
+  #kontak{background:var(--ink); color:var(--paper); border-top:none;}
+  #kontak h2{color:var(--paper);}
+  #kontak .sub{color:#A9B8B2;}
+  .contact-list{list-style:none; padding:0; margin:0; display:grid; gap:12px; font-size:17px;}
+  .contact-list a{color:var(--amber); text-decoration:none; font-weight:500;}
+  .contact-list a:hover{text-decoration:underline;}
+  .contact-label{color:#A9B8B2; font-size:14px; display:block;}
+
+  footer{padding:32px 0; font-size:14px; color:var(--ink-soft);}
+  footer p{margin:4px 0;}
+
+  a:focus-visible, .cta:focus-visible{outline:3px solid var(--amber); outline-offset:3px;}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr; gap:40px;}
+    .steps,.feats,.who{grid-template-columns:1fr;}
+    .phone{max-width:400px;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap navrow">
+    <div class="logo">nyambungin<span>.</span></div>
+    <a class="navlink" href="https://wa.me/6285659787935?text=Halo%20nyambungin%2C%20saya%20mau%20tanya%20soal%20chatbot%20WhatsApp%20untuk%20bisnis%20saya." target="_blank" rel="noopener">Hubungi kami</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero">
+    <div>
+      <h1>Pelanggan Anda bertanya jam 11 malam. Sekarang ada yang menjawab.</h1>
+      <p class="lede">
+        nyambungin memasang dan mengelola chatbot WhatsApp untuk toko dan distributor
+        di Indonesia. Pertanyaan produk, harga, dan stok dijawab otomatis. Tim Anda
+        hanya turun tangan saat benar-benar dibutuhkan.
+      </p>
+      <a class="cta" href="https://wa.me/6285659787935?text=Halo%20nyambungin%2C%20saya%20mau%20tanya%20soal%20chatbot%20WhatsApp%20untuk%20bisnis%20saya." target="_blank" rel="noopener">Chat kami di WhatsApp</a>
+      <p class="cta-note">Balasan pada jam kerja. Tidak dipungut biaya untuk konsultasi awal.</p>
+    </div>
+
+    <div class="phone">
+      <div class="phone-top">
+        <div class="avatar">A</div>
+        <div>
+          <div class="phone-name">Toko Anda</div>
+          <div class="phone-status">online</div>
+        </div>
+      </div>
+      <div class="msg in">Malam, kasur busa ukuran 160 masih ada?</div>
+      <div class="msg out">Malam kak, ada. Ukuran 160x200 tebal 20cm, harga Rp 1.850.000 sudah termasuk cover.</div>
+      <div class="msg in">Bisa kirim ke Cimahi?</div>
+      <div class="msg out">Bisa kak. Untuk Cimahi ongkir Rp 75.000, pengiriman 1–2 hari kerja.</div>
+      <div class="msg in">Oke saya pesan ya</div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Chat yang menumpuk itu bukan masalah kecil</h2>
+    <p class="sub">
+      Pertanyaan yang sama datang berulang setiap hari. Yang masuk malam hari baru
+      dibaca besok pagi, dan sebagian pembeli sudah pindah ke toko lain. Sementara
+      staf Anda menghabiskan waktu mengetik jawaban yang itu-itu saja.
+    </p>
+    <div class="feats">
+      <div class="feat">
+        <h3>Dijawab dalam hitungan detik</h3>
+        <p>Bot membalas kapan pun pesan masuk, termasuk di luar jam kerja dan hari libur.</p>
+      </div>
+      <div class="feat">
+        <h3>Jawaban sesuai data Anda</h3>
+        <p>Harga, stok, dan ketentuan pengiriman diambil dari katalog yang Anda tentukan sendiri.</p>
+      </div>
+      <div class="feat">
+        <h3>Diserahkan ke staf saat perlu</h3>
+        <p>Permintaan nego, keluhan, dan pesanan khusus otomatis diteruskan ke tim Anda.</p>
+      </div>
+      <div class="feat">
+        <h3>Satu nomor, banyak admin</h3>
+        <p>Beberapa orang bisa melayani nomor yang sama tanpa saling berebut ponsel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Cara kerjanya</h2>
+    <p class="sub">Anda tidak perlu mengerti teknisnya. Kami yang mengerjakan, Anda tinggal menerima hasilnya.</p>
+    <div class="steps">
+      <div class="step">
+        <h3>Kami pelajari bisnis Anda</h3>
+        <p>Daftar produk, harga, jam buka, dan cara Anda biasa menjawab pelanggan.</p>
+      </div>
+      <div class="step">
+        <h3>Kami pasang di nomor Anda</h3>
+        <p>Pemasangan lewat WhatsApp Business Platform resmi dari Meta, bukan aplikasi tidak resmi.</p>
+      </div>
+      <div class="step">
+        <h3>Kami jaga setiap hari</h3>
+        <p>Sistem dipantau, jawaban diperbaiki, dan katalog diperbarui saat ada perubahan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Cocok untuk</h2>
+    <p class="sub">Bisnis yang penjualannya lewat WhatsApp dan pertanyaannya berulang.</p>
+    <div class="who">
+      <div>
+        <h3>Distributor &amp; grosir</h3>
+        <p>Katalog besar, pembeli sering menanyakan stok dan harga per ukuran.</p>
+      </div>
+      <div>
+        <h3>Toko retail</h3>
+        <p>Pertanyaan harga dan ketersediaan datang sepanjang hari dari banyak orang.</p>
+      </div>
+      <div>
+        <h3>Jasa dengan jadwal</h3>
+        <p>Klinik, bengkel, dan penyewaan yang perlu menjawab ketersediaan dan tarif.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="kontak">
+  <div class="wrap">
+    <h2>Bicara dulu, tidak dipungut biaya</h2>
+    <p class="sub">
+      Ceritakan bisnis Anda dan pertanyaan apa yang paling sering masuk. Kami jelaskan
+      apa yang bisa dan tidak bisa dilakukan bot, sebelum Anda memutuskan apa pun.
+    </p>
+    <a class="cta cta-light" href="https://wa.me/6285659787935?text=Halo%20nyambungin%2C%20saya%20mau%20tanya%20soal%20chatbot%20WhatsApp%20untuk%20bisnis%20saya." target="_blank" rel="noopener">Mulai chat di WhatsApp</a>
+    <ul class="contact-list" style="margin-top:34px;">
+      <li>
+        <span class="contact-label">WhatsApp</span>
+        <a href="https://wa.me/6285659787935" target="_blank" rel="noopener">+62 856-5978-7935</a>
+      </li>
+      <li>
+        <span class="contact-label">Email</span>
+        <a href="mailto:nyambungin1@gmail.com">nyambungin1@gmail.com</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>nyambungin</strong> — layanan pemasangan dan pengelolaan chatbot WhatsApp untuk bisnis.</p>
+    <p>Bandung, Jawa Barat, Indonesia</p>
+  </div>
+</footer>
+
+</body>
+</html>
