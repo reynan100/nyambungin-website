@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sambungkan WhatsApp — nyambungin</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--bg:#f6f7f4;--card:#fff;--ink:#17201b;--muted:#5d6b63;--line:#dde3dd;--accent:#1f6f4f;--accent-ink:#fff;--ok:#1f6f4f;--err:#a33a2a}
+  @media (prefers-color-scheme:dark){:root{--bg:#111613;--card:#18201b;--ink:#e7eee9;--muted:#9aa8a0;--line:#2a352f;--accent:#6fcf9f;--accent-ink:#0d1a13;--ok:#6fcf9f;--err:#f08a7a}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:34rem;margin:0 auto;padding:40px 16px 64px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+  h1{font-size:1.5rem;line-height:1.25;margin:0 0 6px}
+  p{margin:0 0 12px}
+  .muted{color:var(--muted);font-size:.93rem}
+  ol{padding-left:1.2rem;margin:16px 0 20px}
+  li{margin-bottom:6px}
+  label{display:block;font-weight:600;font-size:.93rem;margin-bottom:6px}
+  input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--ink);font:inherit}
+  button{margin-top:16px;width:100%;padding:14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.55;cursor:default}
+  #status{margin-top:16px;min-height:1.5em;font-size:.95rem}
+  #status.ok{color:var(--ok)} #status.err{color:var(--err)}
+  footer{margin-top:20px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>Sambungkan WhatsApp Bisnis Anda</h1>
+    <p class="muted">Nomor tetap bisa dipakai di aplikasi WhatsApp Business di HP Anda. Chatbot nyambungin berjalan berdampingan.</p>
+
+    <ol>
+      <li>Siapkan HP yang ada aplikasi <strong>WhatsApp Business</strong> (versi terbaru).</li>
+      <li>Klik tombol di bawah, lalu login Facebook.</li>
+      <li>Pilih opsi <strong>menghubungkan aplikasi WhatsApp Business yang sudah ada</strong>.</li>
+      <li>Scan kode QR yang muncul pakai HP tadi.</li>
+    </ol>
+
+    <label for="biz">Nama bisnis</label>
+    <input id="biz" type="text" placeholder="contoh: Toko Busa Makmur" autocomplete="organization">
+
+    <button id="go" disabled>Memuat…</button>
+    <div id="status" aria-live="polite"></div>
+  </div>
+  <footer class="muted"><a href="/privacy.html" style="color:inherit">Kebijakan Privasi</a> · <a href="/hapus-data.html" style="color:inherit">Penghapusan Data</a></footer>
+</main>
+
+<script>
+  // ====== ISI 1 BARIS INI ======
+  var CONFIG_ID = '2528018771035664';
+  // =============================
+  var APP_ID = '4400149266980940';
+  var N8N_URL = 'https://n8n-production-9bef.up.railway.app/webhook/wa-connect';
+
+  var btn = document.getElementById('go');
+  var statusEl = document.getElementById('status');
+  var got = { code: null, waba_id: null, phone_number_id: null, event: null };
+  var sent = false, waitTimer = null;
+
+  function setStatus(msg, kind){ statusEl.textContent = msg; statusEl.className = kind || ''; }
+
+  // Info dari pop-up Meta (ID akun WA + ID nomor)
+  window.addEventListener('message', function (e) {
+    if (!/facebook\.com$/.test(new URL(e.origin).hostname)) return;
+    var d; try { d = JSON.parse(e.data); } catch (_) { return; }
+    if (!d || d.type !== 'WA_EMBEDDED_SIGNUP') return;
+    if (/^FINISH/.test(d.event)) {
+      got.event = d.event;
+      got.waba_id = d.data && d.data.waba_id;
+      got.phone_number_id = d.data && d.data.phone_number_id;
+      trySend();
+    } else if (d.event === 'CANCEL') {
+      setStatus('Proses dibatalkan. Silakan coba lagi.', 'err'); btn.disabled = false;
+    } else if (d.event === 'ERROR') {
+      setStatus('Meta menolak: ' + ((d.data && d.data.error_message) || 'error tidak diketahui'), 'err'); btn.disabled = false;
+    }
+  });
+
+  function trySend(){
+    if (sent || !got.code) return;
+    if (!got.waba_id) {
+      if (!waitTimer) waitTimer = setTimeout(function(){
+        if (!got.waba_id) { setStatus('Data akun WhatsApp tidak diterima dari Meta. Hubungi nyambungin.', 'err'); btn.disabled = false; }
+      }, 15000);
+      return;
+    }
+    sent = true; clearTimeout(waitTimer);
+    setStatus('Menyimpan sambungan…');
+    var form = new URLSearchParams({
+      code: got.code, waba_id: got.waba_id, phone_number_id: got.phone_number_id || '',
+      event: got.event || '', business_name: document.getElementById('biz').value.trim()
+    });
+    fetch(N8N_URL, { method: 'POST', body: form })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j && j.ok) setStatus('Berhasil! Nomor ' + (j.nomor || '') + ' sudah tersambung. Tim nyambungin akan mengaktifkan chatbot Anda.', 'ok');
+        else setStatus('Sambungan terkirim, tapi ada kendala. Tim nyambungin akan menghubungi Anda.', 'err');
+      })
+      .catch(function(){
+        setStatus('Data sudah terkirim. Tim nyambungin akan konfirmasi ke Anda.', 'ok');
+      });
+  }
+
+  btn.addEventListener('click', function(){
+    btn.disabled = true; sent = false; got = { code: null, waba_id: null, phone_number_id: null, event: null };
+    setStatus('Ikuti langkah di jendela Meta…');
+    FB.login(function (res) {
+      if (res.authResponse && res.authResponse.code) { got.code = res.authResponse.code; trySend(); }
+      else if (!got.waba_id) { setStatus('Login dibatalkan.', 'err'); btn.disabled = false; }
+    }, {
+      config_id: CONFIG_ID,
+      response_type: 'code',
+      override_default_response_type: true,
+      extras: { setup: {}, featureType: 'whatsapp_business_app_onboarding', sessionInfoVersion: '3' }
+    });
+  });
+
+  window.fbAsyncInit = function () {
+    FB.init({ appId: APP_ID, autoLogAppEvents: true, xfbml: false, version: 'v22.0' });
+    btn.disabled = false; btn.textContent = 'Sambungkan WhatsApp';
+  };
+</script>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+</body>
+</html>
