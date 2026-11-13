@@ -69,7 +69,7 @@
     if (!d || d.type !== 'WA_EMBEDDED_SIGNUP') return;
     if (/^FINISH/.test(d.event)) {
       got.event = d.event;
-      got.waba_id = d.data && d.data.waba_id;
+      got.waba_id = d.data && (d.data.waba_id || (d.data.messaging_account_ids || [])[0]);
       got.phone_number_id = d.data && d.data.phone_number_id;
       trySend();
     } else if (d.event === 'CANCEL') {
@@ -115,7 +115,7 @@
       auth_type: 'reauthorize',
       response_type: 'code',
       override_default_response_type: true,
-      extras: { setup: {}, featureType: 'whatsapp_business_app_onboarding', sessionInfoVersion: '3' }
+      extras: { version: 'v5' }
     });
   });
 
